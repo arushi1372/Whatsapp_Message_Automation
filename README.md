@@ -4,7 +4,7 @@ Developed to support Aveti Learning operations for online education during and a
 
 *** work in progress ***
 
-Once you have downloaded the files, run whatsapp.py from the terminal by using the command <python3 whatsapp.py>.
+Once you have downloaded the files, run whatsapp.py from the terminal by using the command `python3 whatsapp.py`.
 
 You will be prompted to enter the groups names to send the message to. The first time you run this program, you will need
 to enter all of the group names by hand, but the following times, the groups are stored, so if you are sending messages to the same groups, 
