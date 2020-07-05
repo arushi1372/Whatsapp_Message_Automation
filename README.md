@@ -12,3 +12,7 @@ you don't need to re-enter. In addition, you need to scan the QR code the first 
 stored, preventing the need to scan a QR code every time. 
 
 Scheduler is finicky and is being improved upon.
+
+#To Download the Chromedriver Executable
+Download the corresponding chromedriver executable for your machine from this link: https://chromedriver.storage.googleapis.com/index.html?path=83.0.4103.39/.
+Move it to the folder containing the code. All set.
