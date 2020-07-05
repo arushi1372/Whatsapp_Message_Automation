@@ -25,20 +25,6 @@ import datetime
 import argparse
 import pickle
 
-parser = argparse.ArgumentParser(description='PyWhatsapp Guide')
-parser.add_argument('--chrome_driver_path', action='store', type=str, default='/Users/arushi/Desktop/PyWhatsapp-master/chromedriver', \
-                    help='chromedriver executable path (MAC and Windows path would be different)')
-parser.add_argument('--remove_cache', action='store', type=str, default='False', help='Remove Cache | Scan QR again or Not')
-parser.add_argument('--message', action='store', type=str, default='', help='Enter the msg you want to send')
-args, unknown = parser.parse_known_args()
-
-if args.remove_cache == 'True':
-    os.system('rm -rf User_Data/*')
-browser = None
-message = None if args.message == '' else args.message
-Link = "https://web.whatsapp.com/"
-wait = None
-
 def enter_new_groups(message):
     data = {}
     print("Tell us the groups you want to send messages to. Enter all groups separated by a comma.\n")
@@ -170,6 +156,22 @@ def sender():
 # schedule.every().monday.at("08:00").do(sender)
 
 if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser(description='PyWhatsapp Guide')
+    default_path = os.path.join(os.getcwd(), 'chromedriver')
+    parser.add_argument('--chrome_driver_path', action='store', type=str, default=default_path, \
+                        help='chromedriver executable path (MAC and Windows path would be different)')
+    parser.add_argument('--remove_cache', action='store', type=str, default='False', help='Remove Cache | Scan QR again or Not')
+    parser.add_argument('--message', action='store', type=str, default='', help='Enter the msg you want to send')
+    args, unknown = parser.parse_known_args()
+
+    if args.remove_cache == 'True':
+        os.system('rm -rf User_Data/*')
+    browser = None
+    message = None if args.message == '' else args.message
+    Link = "https://web.whatsapp.com/"
+    wait = None
+    
     print("Web Page Open")
     # Append more contact as input to send messages
     input_contacts()
