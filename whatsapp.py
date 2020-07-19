@@ -4,11 +4,14 @@ import sys
 import os
 import shutil
 import subprocess
+import logging
 
 if 'schedule' not in sys.modules:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "schedule"])
 if 'selenium' not in sys.modules:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "selenium"])
+if 'pandas' not in sys.modules:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pandas"])
 
 import schedule
 from selenium import webdriver
@@ -17,6 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 
@@ -24,72 +28,8 @@ import time
 import datetime
 import argparse
 import pickle
-
-def enter_new_groups(message):
-    data = {}
-    print("Tell us the groups you want to send messages to. Enter all groups separated by a comma.\n")
-    group = str(input("Enter group names here: "))
-    group = '"' + group + '"'
-    group_list = group.split(",")
-    for elem in group_list:
-        data[elem] = message
-    return data
-
-def input_contacts():
-    #if no contacts list exists, create one
-    message = "ଆସନ୍ତାକାଲି ର ବିଷୟ : ଇତିହାସ – 'ଭାରତୀୟ ଜାତୀୟ ଆନ୍ଦୋଳନରେ ଗାନ୍ଧିଜୀଙ୍କ ଆବିର୍ଭାବ' \n\n" + "ସମୟ : ଘ୧୧.୦୦ \n\n" + \
-"ଲାଇଭ କ୍ଲାସ୍‍ ଆସନ୍ତାକାଲି ସକାଳ ୧୧.୦୦ ଘଟିକା ସମୟରେ ଆରମ୍ଭ ହେବ । କ୍ଲାସ୍‍ ଆରମ୍ଭ ର କିଛି ସମୟ ପୁର୍ବରୁ ଆପଣଙ୍କୁ ଭିଡ଼ିଓ ର ଲିଙ୍କ୍ ଏହି Groupରେ ଦିଆଯିବ ।ଆପଣ ମାନେ ଦିଆଯାଇଥିବା ଲିଙ୍କ୍ ରେ କ୍ଲିକ୍ କରି କ୍ଲାସ୍‌ରେ ଯୋଗଦେବାକୁ ଅନୁରୋଧ । \n\n" + \
-"https://youtu.be/IUHwxd0zo0A \n\n" + "ଲାଇଭ୍‍ କ୍ଲାସ୍ ଚାଲୁଅଛି । ଦୟାକରି ଉପରୋକ୍ତ ଲିଙ୍କ୍‌ରେ କ୍ଲିକ୍ କରି ଯୋଗ ଦିଅନ୍ତୁ \n"
-    
-    inp = str(input("Use the groups you entered last (type a) or enter new groups (type b)? (a/b)"))
-    if inp == "a":
-        try:
-            data = pickle.load(open("groups.pkl", "rb")) 
-        except (OSError, IOError) as e:
-            print("No previous groups found; please enter new groups.")
-            data = enter_new_groups(message)
-    elif inp == "b":
-        data = enter_new_groups(message)
-    else:
-        print("Please enter either a or b.")
-        
-#     try:
-#         groups = pickle.load(open("groups.pkl", "rb")) 
-#     except (OSError, IOError) as e:
-#         print("Tell us the groups you want to send messages to. Enter all groups separated by a comma.\n")
-#         while True:
-#             inp = str(input("Would you like to enter another group and message? (y/n)"))
-#             if inp == "y":
-#                 group = str(input("Enter group name here: "))
-#                 group = '"' + group + '"'
-                
-#                 data[group] = message
-#             elif inp == "n":
-#                 print(data)
-#                 break
-#             else:
-#                 print("Please enter either y or n.")
-    pickle.dump(data, open("groups.pkl","wb"))
-    input("\nPress ENTER to continue...")
-
-def input_message():
-    print()
-    print("Enter the message to send to this group and use the symbol '~' to end the message:\n \
-    For example: Hi, this is a test message~\n\nYour message: ")
-    message = ""
-    temp = ""
-    done = False
-
-    while not done:
-        temp = input()
-        if len(temp) != 0 and temp[-1] == "~":
-            done = True
-            message += (temp[:-1])
-        else:
-            message += (temp)
-    message = "\n".join(message)
-    print()
-    return message
+import pandas as pd
+from random import randint
 
 def whatsapp_login(chrome_path):
     global wait, browser, Link
@@ -98,7 +38,7 @@ def whatsapp_login(chrome_path):
     try:
         browser = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
     except:
-        shutil.rmtree("User_Data")
+        shutil.rmtree("User_Data", ignore_errors = True)
         chrome_options = Options()
         chrome_options.add_argument('--user-data-dir=./User_Data')
         browser = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
@@ -115,17 +55,17 @@ def whatsapp_login(chrome_path):
 
 def send_message(target, message):
     global wait, browser
+    wait5 = WebDriverWait(browser, 10)
+    x_arg = '//*[@id="side"]/div[1]/div/label/div/div[2]'
+    inputSearchBox = wait5.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+    inputSearchBox.click()
+    inputSearchBox.clear()
+    inputSearchBox.send_keys(target)
+    time.sleep(5)
     try:
-        x_arg = '//span[contains(@title,' + target + ')]'
-        ct = 0
-        while ct != 10:
-            try:
-                group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
-                group_title.click()
-                break
-            except:
-                ct += 1
-                time.sleep(3)
+        browser.find_element_by_css_selector('span[title=' + target + ']').click()
+        print("Target Successfully Selected")
+        time.sleep(2)
         input_box = browser.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
         for ch in message:
             if ch == "\n":
@@ -136,6 +76,7 @@ def send_message(target, message):
         print("Message sent successfuly")
         time.sleep(1)
     except NoSuchElementException:
+        print("Group " + target + " not available.")
         return
 
 def scheduler():
@@ -144,18 +85,31 @@ def scheduler():
         time.sleep(1)
 
 def sender():
-    groups = pickle.load(open("groups.pkl", "rb"))
-    for key, value in groups.items():
-        group = key
-        message = value
+    to_send = pd.read_csv("groups.csv")
+    for index, row in to_send.iterrows():
+        group = row["groups"]
+        message_file = row["messages"]
+        if os.path.isfile(os.path.join("Messages", message_file)):
+            with open(os.path.join("Messages", message_file), "r") as f:
+                message = f.read()
+        else:
+            with open(os.path.join("Messages/default.txt"), "r") as f:
+                message = f.read()
+        print(group)
+        print(message)
         send_message(group, message)
-        print("Message sent to ", key)
-    time.sleep(5)
+        print("Message send to ", group)
+        time.sleep(randint(10,20))
 
 # # Example Schedule for a particular day of week Monday
 # schedule.every().monday.at("08:00").do(sender)
 
+def validate():
+    return os.path.isfile("Messages/default.txt")
+        
+
 if __name__ == "__main__":
+    sys.stderr = open('error_logs.txt', 'w')
     
     parser = argparse.ArgumentParser(description='PyWhatsapp Guide')
     default_path = os.path.join(os.getcwd(), 'chromedriver')
@@ -172,9 +126,12 @@ if __name__ == "__main__":
     Link = "https://web.whatsapp.com/"
     wait = None
     
+    if not validate():
+        print("Default message file located in 'Messages/default.txt' does not exist.")
+        exit()
+    
     print("Web Page Open")
     # Append more contact as input to send messages
-    input_contacts()
 
     isSchedule = input('Do you want to schedule your Message(yes/no):')
     if(isSchedule == "yes"):
@@ -183,15 +140,16 @@ if __name__ == "__main__":
     # Let us login and Scan
     print("SCAN YOUR QR CODE FOR WHATSAPP WEB")
     whatsapp_login(args.chrome_driver_path)
+    time.sleep(10)
         
     if(isSchedule == "yes"):
         schedule.every().day.at(jobtime).do(sender)
+        scheduler()
     else:
         sender()
 
     # First time message sending Task Complete
     print("Task Completed")
-
-    scheduler()
+    os.system("rm -rf User_Data")
     message = None
     browser.quit()
