@@ -72,7 +72,7 @@ def send_message(target, message):
     inputSearchBox.send_keys(target)
     time.sleep(5)
     try:
-        browser.find_element_by_css_selector('span[title=' + target + ']').click()
+        browser.find_element_by_css_selector('span[title="{}"]'.format(target)).click()
         print("Target Successfully Selected")
         time.sleep(2)
         input_box = browser.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
