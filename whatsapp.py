@@ -6,14 +6,24 @@ import shutil
 import subprocess
 import logging
 
-if 'schedule' not in sys.modules:
+try:
+    import schedule
+except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "schedule"])
-if 'selenium' not in sys.modules:
+    import schedule
+    
+try:
+    import selenium
+except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "selenium"])
-if 'pandas' not in sys.modules:
+    import selenium
+    
+try:
+    import pandas as pd
+except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "pandas"])
+    import pandas as pd
 
-import schedule
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -28,7 +38,6 @@ import time
 import datetime
 import argparse
 import pickle
-import pandas as pd
 from random import randint
 
 def whatsapp_login(chrome_path):
@@ -73,10 +82,11 @@ def send_message(target, message):
             else:
                 input_box.send_keys(ch)
         input_box.send_keys(Keys.ENTER)
-        print("Message sent successfuly")
+        print("Message sent to: ", target)
         time.sleep(1)
     except NoSuchElementException:
-        print("Group " + target + " not available.")
+        with open("group_errors.txt", "a+") as f:
+            print("Group " + target + " not available.", file = f)
         return
 
 def scheduler():
@@ -84,8 +94,8 @@ def scheduler():
         schedule.run_pending()
         time.sleep(1)
 
-def sender():
-    to_send = pd.read_csv("groups.csv")
+def sender(group_file):
+    to_send = pd.read_csv(group_file)
     for index, row in to_send.iterrows():
         group = row["groups"]
         message_file = row["messages"]
@@ -95,10 +105,7 @@ def sender():
         else:
             with open(os.path.join("Messages/default.txt"), "r") as f:
                 message = f.read()
-        print(group)
-        print(message)
         send_message(group, message)
-        print("Message send to ", group)
         time.sleep(randint(10,20))
 
 # # Example Schedule for a particular day of week Monday
@@ -109,7 +116,15 @@ def validate():
         
 
 if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        group_file = sys.argv[1]
+    else:
+        print("Please enter name of csv file containing group names.")
+        exit()
+    
     sys.stderr = open('error_logs.txt', 'w')
+    with open("group_errors.txt", 'w') as f:
+        pass
     
     parser = argparse.ArgumentParser(description='PyWhatsapp Guide')
     default_path = os.path.join(os.getcwd(), 'chromedriver')
@@ -146,10 +161,10 @@ if __name__ == "__main__":
         schedule.every().day.at(jobtime).do(sender)
         scheduler()
     else:
-        sender()
+        sender(group_file)
 
     # First time message sending Task Complete
     print("Task Completed")
-    os.system("rm -rf User_Data")
+#     os.system("rm -rf User_Data")
     message = None
     browser.quit()
