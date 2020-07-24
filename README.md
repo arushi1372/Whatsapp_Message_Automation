@@ -10,6 +10,8 @@ This program takes in a csv file as a command-line argument. The csv file should
 
 In addition, you need to scan the QR code the first time around, but once you do that, the corresponding cookies are stored, preventing the need to scan a QR code every time. 
 
+Errors are outputted to error_logs.txt and unavailable groups that messages were not sent to are located in group_errors.txt.
+
 Scheduler is finicky and is being improved upon.
 
 Update with capability to send image files coming soon.
