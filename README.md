@@ -17,5 +17,5 @@ Scheduler is finicky and is being improved upon.
 Update with capability to send image files coming soon.
 
 # To Download the Chromedriver Executable
-Download the corresponding chromedriver executable for your machine from this link: https://chromedriver.storage.googleapis.com/index.html?path=83.0.4103.39/.
+Download the corresponding chromedriver executable for your machine from this link: https://chromedriver.chromium.org/downloads. Make sure you get the same version as is specified for your current Google Chrome version!
 Move it to the folder containing the code. All set.
