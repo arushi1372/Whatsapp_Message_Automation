@@ -126,7 +126,7 @@ if __name__ == "__main__":
     with open("group_errors.txt", 'w') as f:
         pass
     
-    parser = argparse.ArgumentParser(description='PyWhatsapp Guide')
+    parser = argparse.ArgumentParser(description='Whatsapp Webdriver')
     default_path = os.path.join(os.getcwd(), 'chromedriver')
     parser.add_argument('--chrome_driver_path', action='store', type=str, default=default_path, \
                         help='chromedriver executable path (MAC and Windows path would be different)')
