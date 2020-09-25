@@ -146,11 +146,10 @@ if __name__ == "__main__":
         exit()
     
     print("Web Page Open")
-    # Append more contact as input to send messages
 
-    isSchedule = input('Do you want to schedule your Message(yes/no):')
-    if(isSchedule == "yes"):
-        jobtime = input('input time in 24 hour (HH:MM) format - ')
+#     isSchedule = input('Do you want to schedule your Message(yes/no):')
+#     if(isSchedule == "yes"):
+#         jobtime = input('input time in 24 hour (HH:MM) format - ')
 
     # Let us login and Scan
     print("SCAN YOUR QR CODE FOR WHATSAPP WEB")
@@ -163,7 +162,6 @@ if __name__ == "__main__":
     else:
         sender(group_file)
 
-    # First time message sending Task Complete
     print("Task Completed")
 #     os.system("rm -rf User_Data")
     message = None
