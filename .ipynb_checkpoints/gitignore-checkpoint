@@ -1,0 +1,9 @@
+chromedriver
+cookies.pkl
+error_logs.txt
+group_errors.txt
+groups.csv
+Files/
+Images/
+Messages/
+User_Data/
