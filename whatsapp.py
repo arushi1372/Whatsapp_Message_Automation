@@ -69,17 +69,18 @@ def send_files(image, filename):
         browser.find_element_by_css_selector("span[data-icon='clip']").click();
         filepath = os.path.join(os.getcwd(), "Files", filename)
         # click on documents button
-        image_box = browser.find_element_by_xpath('//input[@accept="*"]')
-        image_box.send_keys(filepath)
+        file_box = browser.find_element_by_xpath('//input[@accept="*"]')
+        file_box.send_keys(filepath)
         time.sleep(3)
         # send
         send_button = browser.find_element_by_xpath('//span[@data-icon="send"]')
         send_button.click()
+    time.sleep(3)
     if image is not None:
         browser.find_element_by_css_selector("span[data-icon='clip']").click();
-        filepath = os.path.join(os.getcwd(), "Images", image)
+        imagepath = os.path.join(os.getcwd(), "Images", image)
         image_box = browser.find_element_by_xpath('//input[@accept="image/*,video/mp4,video/3gpp,video/quicktime"]')
-        image_box.send_keys(filepath)
+        image_box.send_keys(imagepath)
         time.sleep(3)
         send_button = browser.find_element_by_xpath('//span[@data-icon="send"]')
         send_button.click()
@@ -106,12 +107,12 @@ def send_message(target, message, image = None, file = None):
         input_box.send_keys(Keys.ENTER)
         print("Message sent to: ", target)
         time.sleep(1)
+        if file is not None or image is not None:
+            send_files(image, file)
     except NoSuchElementException:
         with open("group_errors.txt", "a+") as f:
             print("Group " + target + " not available.", file = f)
         return
-    if file is not None and image is not None:
-        send_files(image, file)
 
 def scheduler():
     while True:
