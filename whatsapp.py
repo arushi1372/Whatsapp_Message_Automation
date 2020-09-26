@@ -100,7 +100,6 @@ def send_message(target, message, image = None, file = None):
         print("Target Successfully Selected")
         time.sleep(2)
         input_box = browser.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
-        message = ""
         for ch in message:
             if ch == "\n":
                 ActionChains(browser).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.BACKSPACE).perform()
