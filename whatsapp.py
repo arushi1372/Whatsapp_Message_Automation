@@ -11,13 +11,13 @@ try:
 except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "schedule"])
     import schedule
-    
+
 try:
     import selenium
 except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "selenium"])
     import selenium
-    
+
 try:
     import pandas as pd
 except ImportError:
@@ -61,7 +61,7 @@ def whatsapp_login(chrome_path):
         pickle.dump(browser.get_cookies(), open("cookies.pkl","wb"))
     browser.maximize_window()
     print("QR scanned")
-    
+
 def send_files(image, filename):
     global browser
     if filename is not None:
@@ -110,7 +110,7 @@ def send_message(target, message, image = None, file = None):
         with open("group_errors.txt", "a+") as f:
             print("Group " + target + " not available.", file = f)
         return
-    if file is not None:
+    if file is not None and image is not None:
         send_files(image, file)
 
 def scheduler():
@@ -126,17 +126,17 @@ def sender(group_file):
         image = row["images"]
         file = row["attachments"]
         if os.path.isfile(os.path.join("Messages", message_file)):
-            with open(os.path.join("Messages", message_file), "r") as f:
+            with open(os.path.join("Messages", message_file), "r", encoding = "utf8") as f:
                 message = f.read()
         else:
-            with open(os.path.join("Messages/default.txt"), "r") as f:
+            with open(os.path.join("Messages/default.txt"), "r", encoding = "utf8") as f:
                 message = f.read()
         send_message(group, message, image, file)
         time.sleep(randint(5,15))
 
 def validate():
     return os.path.isfile("Messages/default.txt")
-        
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -144,11 +144,11 @@ if __name__ == "__main__":
     else:
         print("Please use name of csv file containing group names as an argument.")
         exit()
-    
+
     sys.stderr = open('error_logs.txt', 'w')
     with open("group_errors.txt", 'w') as f:
         pass
-    
+
     parser = argparse.ArgumentParser(description='Whatsapp Webdriver')
     default_path = os.path.join(os.getcwd(), 'chromedriver')
     parser.add_argument('--chrome_driver_path', action='store', type=str, default=default_path, \
@@ -163,11 +163,11 @@ if __name__ == "__main__":
     message = None if args.message == '' else args.message
     Link = "https://web.whatsapp.com/"
     wait = None
-    
+
     if not validate():
         print("Default message file located in 'Messages/default.txt' does not exist.")
         exit()
-    
+
     print("Web Page Open")
 
 #     isSchedule = input('Do you want to schedule your Message(yes/no):')
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     print("SCAN YOUR QR CODE FOR WHATSAPP WEB")
     whatsapp_login(args.chrome_driver_path)
     time.sleep(10)
-        
+
 #     if(isSchedule == "yes"):
 #         schedule.every().monday.at("08:00").do(sender)
 #         schedule.every().day.at(jobtime).do(sender)
