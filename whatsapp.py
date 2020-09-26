@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import logging
+import math
 
 try:
     import schedule
@@ -99,6 +100,7 @@ def send_message(target, message, image = None, file = None):
         print("Target Successfully Selected")
         time.sleep(2)
         input_box = browser.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
+        message = ""
         for ch in message:
             if ch == "\n":
                 ActionChains(browser).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.BACKSPACE).perform()
@@ -121,11 +123,15 @@ def scheduler():
 
 def sender(group_file):
     to_send = pd.read_csv(group_file)
+    to_send = to_send.fillna('')
     for index, row in to_send.iterrows():
         group = row["groups"]
         message_file = row["messages"]
-        image = row["images"]
-        file = row["attachments"]
+        if row['images'] == '': image = None
+        else: image = row["images"]
+        if row["attachments"] == '':
+            file = None
+        else: file = row["attachments"]
         if os.path.isfile(os.path.join("Messages", message_file)):
             with open(os.path.join("Messages", message_file), "r", encoding = "utf8") as f:
                 message = f.read()
