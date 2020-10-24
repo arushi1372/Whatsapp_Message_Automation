@@ -1,6 +1,6 @@
 # Whatsapp_Message_Automation
 
-Developed to support Aveti Learning operations for online education during and after COVID-19.
+Developed to support [Aveti Learning](https://www.avetilearning.com/#/home) operations for online education during and after COVID-19.
 
 *** work in progress ***
 
