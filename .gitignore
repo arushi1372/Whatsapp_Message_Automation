@@ -2,8 +2,14 @@ chromedriver
 cookies.pkl
 error_logs.txt
 group_errors.txt
+user_errors.txt
+groups9938289032.txt
+group_names.txt
 groups.csv
+users.csv
 Files/
 Images/
 Messages/
 User_Data/
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
